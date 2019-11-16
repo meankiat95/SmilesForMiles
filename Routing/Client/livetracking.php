@@ -149,9 +149,48 @@ width: 100%;
         window.lat = 0;
         window.lng = 0;
         counter = 0;
-        var endLat=1.3950;
-        var endLng=103.8992;
+	var startLat = findGetParameter("startLat");
+	var startLng = findGetParameter("startLng");
+        var endLat = findGetParameter("endLat");
+        var endLng = findGetParameter("endLng");
         var patharr = [];
+
+	// distance(startLat, startLng, endLat, endLng, "K");
+
+	function distance(lat1, lon1, lat2, lon2, unit) {
+		if ((lat1 == lat2) && (lon1 == lon2)) {
+			return 0;
+		}
+		else {
+			var radlat1 = Math.PI * lat1/180;
+			var radlat2 = Math.PI * lat2/180;
+			var theta = lon1-lon2;
+			var radtheta = Math.PI * theta/180;
+			var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+			if (dist > 1) {
+				dist = 1;
+			}
+			dist = Math.acos(dist);
+			dist = dist * 180/Math.PI;
+			dist = dist * 60 * 1.1515;
+			if (unit=="K") { dist = dist * 1.609344 }
+			if (unit=="N") { dist = dist * 0.8684 }
+			return dist;
+		}
+	}
+
+	function findGetParameter(parameterName) {
+	    var result = null,
+		tmp = [];
+	    location.search
+		.substr(1)
+		.split("&")
+		.forEach(function (item) {
+		  tmp = item.split("=");
+		  if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+		});
+	    return result;
+	}
 
         function getLocation() {
 	        if (navigator.geolocation) {
@@ -162,25 +201,30 @@ width: 100%;
         };
 
         function updatePosition(position) {
-	        if (position) {
-		        window.lat = position.coords.latitude;
-		        window.lng = position.coords.longitude;
-		        var newlat = parseFloat(lat).toFixed(4);
-		        var newlng = parseFloat(lng).toFixed(4);
-		        counter++;
-		        var coor = newlat+newlng ;
-		        console.log("Lat: " + newlat + ",Lng: " + newlng + ",Counter: " + counter);
-            if (!(patharr.includes(coor))) {
-              patharr.push(coor);
-            }
+		if (position) {
+				window.lat = position.coords.latitude;
+				window.lng = position.coords.longitude;
+				var newlat = parseFloat(lat).toFixed(4);
+				var newlng = parseFloat(lng).toFixed(4);
+				counter++;
+				var coor = newlat+newlng ;
+				var distancetravel = distance(startLat, startLng, newlat, newlng, "K");
+				var speed = distancetravel/(counter*5000);
+				//if(speed > 0.010) {
+				//	alert("You are going too fast!");				
+				//}
+				console.log("Lat: " + newlat + ",Lng: " + newlng + ",Counter: " + counter + ",Speed: " + speed);
+		    if (!(patharr.includes(coor))) {
+		      patharr.push(coor);
+		    }
 
-            if (newlat == endLat && newlng == endLng) {
-              var path = patharr.toString();
-              alert("Route Completed!" + path);
-            }
+		    if (newlat == endLat && newlng == endLng) {
+		      var path = patharr.toString();
+		      // alert("Route Completed!" + path);
+		    }
 
-	        }
-        }
+			}
+		}
 
         setInterval(function(){updatePosition(getLocation());}, 5000);
 
@@ -219,6 +263,11 @@ width: 100%;
         setInterval(function() {
         pubnub.publish({channel:pnChannel, message:currentLocation()});
       }, 5000);
+
+	function redirectToHome() {
+		window.location.replace("/index.php");	
+	}
+
       </script>
       <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBCMM3HSFgOH9c6c46fIaXsJybNY6vCrHU&callback=initialize"></script>
 
@@ -231,13 +280,13 @@ width: 100%;
         </button>
       </center>
       <center>
-        <button onclick="alert('Quit')" style="width:auto;">End Route
+        <button onclick="redirectToHome()" style="width:auto;">End Route
         </button>
       </center>
 
       <div id="id01" class="modal">
 
-      <form class="modal-content animate" action="/feedback.php" method="post">
+      <form class="modal-content animate" action="/feedback.php" target="_blank" method="post">
         <div class="imgcontainer">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
           <img src="img_avatar2.png" alt="Avatar" class="avatar">
@@ -245,9 +294,8 @@ width: 100%;
 
         <div class="container" id="feedbackcontainer">
           <center><label for="uname"><b>Feedback</b></label></center>
-          <input type="text" placeholder="Enter Feedback" name="feedback" required>
-
-          <button type="submit">Submit Feedback</button>
+          <input type="text" onfocus="this.value=''" placeholder="Enter Feedback" name="feedback" required>
+          <button type="submit" onclick="document.getElementById('id01').style.display='none'">Submit Feedback</button>
         </div>
       </form>
     </div>
@@ -255,6 +303,8 @@ width: 100%;
     <script>
     // Get the modal
     var modal = document.getElementById('id01');
+
+
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
@@ -265,18 +315,3 @@ width: 100%;
     </script>
   </body>
 </html>
-
-var http = new XMLHttpRequest();
-var url = 'get_data.php';
-var params = 'orem=ipsum&name=binny';
-http.open('POST', url, true);
-
-//Send the proper header information along with the request
-http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-http.onreadystatechange = function() {//Call a function when the state changes.
-    if(http.readyState == 4 && http.status == 200) {
-        alert(http.responseText);
-    }
-}
-http.send(params);
