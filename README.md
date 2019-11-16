@@ -4,7 +4,7 @@
 ## Introduction
 
 ## Updated Component Diagram
-![GitHub Logo](/Images/Domain Object Modeling Example - Component Diagram.png)
+![GitHub Logo](https://raw.githubusercontent.com/qwacsawd/SmilesForMiles/master/Images/Domain%20Object%20Modeling%20Example%20-%20Component%20Diagram.png)
 
 ## How to run
 
