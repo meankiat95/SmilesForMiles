@@ -4,6 +4,7 @@
 ## Introduction
 
 ## Updated Component Diagram
+![GitHub Logo](/Images/Domain Object Modeling Example - Component Diagram.png)
 
 ## How to run
 
