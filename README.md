@@ -4,7 +4,7 @@
 ## Introduction
 
 ## Updated Component Diagram
-![GitHub Logo](https://raw.githubusercontent.com/qwacsawd/SmilesForMiles/master/Images/Domain%20Object%20Modeling%20Example%20-%20Component%20Diagram.png)
+![Component Diagram](https://raw.githubusercontent.com/qwacsawd/SmilesForMiles/master/Images/Domain%20Object%20Modeling%20Example%20-%20Component%20Diagram.png)
 
 ## How to run
 
@@ -27,6 +27,15 @@ Requirements for web server
 
   **Why is this needed?**
 
-  To prevent Man-In-The-Middle(MITM) attacks, a secured web server is configured to prevent hackers from being able to modify the GET/POST request between the application and the server to prevent unauthorized use and illegal actions within the application.
+  To prevent Man-In-The-Middle(MITM) attacks, a secured web server is configured to prevent hackers from being able to modify the GET/POST request between the application and the server to prevent unauthorized use and illegal actions within the application. This would include HTTPS configuration and HTTP2 to prevent proxy tools from being able to intercept and modify the request and response within the application.
 
   (Insert screen shot here)
+  
+### 3) Android Application Shell 
+
+  **Why is this needed?**
+  
+  To prevent modification of GET requests via URL modification, the android application is attached to this project even though it is a web based application. Since the android application is able to hard code a fix URL into the loadUrl parameter, user's will not be able to modify or view the URL.
+  
+  (Insert screen shot here)
+  
